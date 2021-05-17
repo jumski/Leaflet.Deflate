@@ -15,6 +15,15 @@
                 left: 0;
                 right: 0;
             }
+            .pyra {
+                border-radius: 8px;
+                padding: 3px;
+                padding-top: 5px;
+                border: 1px solid black;
+                background-color: #cecece;
+                width: auto !important;
+                    height; auto !important;
+            }
         </style>
     </head>
 
@@ -57,10 +66,13 @@
                     }
                 });
                 let freeCnt = markers.length - reservedCnt;
+                let text = `${freeCnt} / ${reservedCnt}`;
+                let html = `<span style="white-space: nowrap;">${text}</span>`;
 
                 return L.divIcon({
-                    html: `${freeCnt} / ${reservedCnt}`,
-                    iconSize: L.point(40, 40)
+                    html: html,
+                    className: 'pyra',
+                    iconSize: L.point(40, 20)
                 });
             },
 
