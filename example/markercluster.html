@@ -36,20 +36,29 @@
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        console.log('L.Deflate._isCollapsed', L.Deflate._isCollapsed);
-        // const MyDeflate = L.Deflate.extend({
-        //     _isCollapsed(path, zoom) { return false; }
-        // });
+        var polygonLayer = L.layerGroup();
+        var markerLayer = L.layerGroup();
+        // var features = L.deflate({minSize: 1, markerLayer: polygonLayer});
+        // features.addTo(map);
 
-        // var layer = L.markerClusterGroup();
-        var layer = L.layerGroup();
-        // var features = new MyDeflate({minSize: 5, markerLayer: layer});
-        var features = L.deflate({minSize: 1, markerLayer: layer});
-        features.addTo(map);
+        map.on('zoomend', function () {
+            if (map.getZoom() > 9 && map.hasLayer(polygonLayer)) {
+                map.removeLayer(polygonLayer);
+                map.addLayer(markerLayer);
+            }
+            if (map.getZoom() <= 9 && map.hasLayer(polygonLayer) == false) {
+                map.addLayer(polygonLayer);
+                map.removeLayer(markerLayer);
+            }
+        });
+        map.addLayer(polygonLayer);
+        map.removeLayer(markerLayer);
 
         fetch('polygons.json').then(r => r.json()).then(polys => {
             polys.forEach(poly => {
-                L.polygon(poly).addTo(features);
+                L.polygon(poly).addTo(polygonLayer);
+
+                L.marker(poly[0]).addTo(markerLayer);
             });
         });
     }
