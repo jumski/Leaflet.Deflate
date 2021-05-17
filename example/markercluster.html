@@ -46,6 +46,24 @@
             showCoverageOnHover: false,
             maxClusterRadius: 120,
             singleMarkerMode: true,
+
+            iconCreateFunction: function (cluster) {
+                var markers = cluster.getAllChildMarkers();
+                let reservedCnt = 0;
+
+                markers.forEach(marker => {
+                    if (marker.options.isReserved) {
+                        reservedCnt+= 1;
+                    }
+                });
+                let freeCnt = markers.length - reservedCnt;
+
+                return L.divIcon({
+                    html: `${freeCnt} / ${reservedCnt}`,
+                    iconSize: L.point(40, 40)
+                });
+            },
+
         });
 
         map.on('zoomend', function () {
@@ -68,7 +86,8 @@
             polys.forEach(poly => {
                 L.polygon(poly).addTo(polygonLayer);
 
-                L.marker(poly[0]).addTo(markerLayer);
+                const isReserved = Math.random() > 0.5;
+                L.marker(poly[0], { isReserved: isReserved }).addTo(markerLayer);
             });
         });
     }
