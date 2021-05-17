@@ -42,17 +42,20 @@
         // features.addTo(map);
 
         map.on('zoomend', function () {
-            if (map.getZoom() > 9 && map.hasLayer(polygonLayer)) {
-                map.removeLayer(polygonLayer);
-                map.addLayer(markerLayer);
-            }
-            if (map.getZoom() <= 9 && map.hasLayer(polygonLayer) == false) {
+            if (map.getZoom() > 9) {
                 map.addLayer(polygonLayer);
-                map.removeLayer(markerLayer);
+
+                if (map.hasLayer(markerLayer))
+                    map.removeLayer(markerLayer);
+            }
+            else {
+                map.addLayer(markerLayer);
+
+                if (map.hasLayer(polygonLayer))
+                    map.removeLayer(polygonLayer);
             }
         });
-        map.addLayer(polygonLayer);
-        map.removeLayer(markerLayer);
+        map.addLayer(markerLayer);
 
         fetch('polygons.json').then(r => r.json()).then(polys => {
             polys.forEach(poly => {
