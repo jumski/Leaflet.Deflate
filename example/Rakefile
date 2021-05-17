@@ -4,6 +4,9 @@ Bundler.require
 POLYGONS_JSON = './texas_polygons.json'
 POLYGONS_OUTPUT = './polygons.json'
 
+HOUSTON_TOP_LEFT = [29.886402, -95.594282]
+HOUSTON_BOTTOM_RIGHT = [29.520477, -95.034870]
+
 # download source json with this command
 # wget -O texas_polygons.json https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/tx_texas_zip_codes_geo.min.json
 
@@ -15,7 +18,15 @@ task :default do
       feature['geometry']['coordinates'].first.map(&:reverse)
     end
 
-  small_polys = polygons.select{ |p| p.size < 50 }
-  File.open(POLYGONS_OUTPUT, 'w') { |f| f.write Oj.dump(small_polys) }
+  within_bounds = -> ((x, y)) { 
+    x < HOUSTON_TOP_LEFT[0] && x > HOUSTON_BOTTOM_RIGHT[0] &&
+    y > HOUSTON_TOP_LEFT[1] && y < HOUSTON_BOTTOM_RIGHT[1]
+  }
+
+  selected_polys = polygons.select do |points|
+    points.all?(within_bounds)
+  end
+
+  File.open(POLYGONS_OUTPUT, 'w') { |f| f.write Oj.dump(selected_polys) }
   puts 'success'
 end
