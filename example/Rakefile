@@ -1,0 +1,18 @@
+require 'bundler'
+Bundler.require
+
+POLYGONS_JSON = './texas_polygons.json'
+POLYGONS_OUTPUT = './polygons.json'
+
+task :default do
+  geojson = Oj.load(File.read(POLYGONS_JSON))
+  polygons = geojson['features']
+    .select { |f| f['geometry']['type'] == 'Polygon' }
+    .map do |feature|
+      feature['geometry']['coordinates'].first.map(&:reverse)
+    end
+
+  small_polys = polygons.select{ |p| p.size < 50 }
+  File.open(POLYGONS_OUTPUT, 'w') { |f| f.write Oj.dump(small_polys) }
+  puts 'success'
+end
