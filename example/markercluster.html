@@ -23,6 +23,11 @@
     <script>
 
     window.onload = function () {
+        const GEOJSON_URL = 'https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/';
+        const state = 'tx_texas';
+        const url = GEOJSON_URL + state + '_zip_codes_geo.min.json';
+        console.log(url);
+
         var map = L.map("map").setView([51.550406, -0.140765], 16);
 
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -30,7 +35,7 @@
         }).addTo(map);
 
         var layer = L.markerClusterGroup();
-        var features = L.deflate({minSize: 20, markerLayer: layer});
+        var features = L.deflate({minSize: 50, markerLayer: layer});
         features.addTo(map);
 
         L.polygon([
