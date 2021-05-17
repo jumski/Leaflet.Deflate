@@ -4,29 +4,41 @@ Bundler.require
 POLYGONS_JSON = './texas_polygons.json'
 POLYGONS_OUTPUT = './polygons.json'
 
-HOUSTON_TOP_LEFT = [29.886402, -95.594282]
-HOUSTON_BOTTOM_RIGHT = [29.520477, -95.034870]
-
 # download source json with this command
 # wget -O texas_polygons.json https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/tx_texas_zip_codes_geo.min.json
 
-task :default do
-  geojson = Oj.load(File.read(POLYGONS_JSON))
-  polygons = geojson['features']
-    .select { |f| f['geometry']['type'] == 'Polygon' }
-    .map do |feature|
-      feature['geometry']['coordinates'].first.map(&:reverse)
+def source_polygons
+  @source_polygons ||=
+    begin
+      geojson = Oj.load(File.read(POLYGONS_JSON))
+      geojson['features']
+        .select { |f| f['geometry']['type'] == 'Polygon' }
+        .map do |feature|
+          feature['geometry']['coordinates'].first.map(&:reverse)
+        end
     end
+end
+
+def save(polygons)
+  puts "saving #{polygons.count} polygons..."
+  File.open(POLYGONS_OUTPUT, 'w') { |f| f.write Oj.dump(polygons) }
+  puts 'success'
+end
+
+task :within_houston do
+  top_left = [29.886402, -95.594282]
+  bottom_right = [29.520477, -95.034870]
 
   within_bounds = -> ((x, y)) { 
-    x < HOUSTON_TOP_LEFT[0] && x > HOUSTON_BOTTOM_RIGHT[0] &&
-    y > HOUSTON_TOP_LEFT[1] && y < HOUSTON_BOTTOM_RIGHT[1]
+    x < top_left[0] && x > bottom_right[0] &&
+    y > top_left[1] && y < bottom_right[1]
   }
 
-  selected_polys = polygons.select do |points|
+  selected_polys = source_polygons.select do |points|
     points.all?(within_bounds)
   end
 
-  File.open(POLYGONS_OUTPUT, 'w') { |f| f.write Oj.dump(selected_polys) }
-  puts 'success'
+  save(selected_polys)
 end
+
+task default: :within_houston
