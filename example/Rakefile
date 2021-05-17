@@ -4,6 +4,9 @@ Bundler.require
 POLYGONS_JSON = './texas_polygons.json'
 POLYGONS_OUTPUT = './polygons.json'
 
+# download source json with this command
+# wget -O texas_polygons.json https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/tx_texas_zip_codes_geo.min.json
+
 task :default do
   geojson = Oj.load(File.read(POLYGONS_JSON))
   polygons = geojson['features']
