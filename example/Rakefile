@@ -34,10 +34,10 @@ task :within_houston do
     y > top_left[1] && y < bottom_right[1]
   }
 
-  # selected_polys = source_polygons
-  selected_polys = source_polygons.select do |points|
-    points.all?(within_bounds)
-  end
+  selected_polys = source_polygons
+  # selected_polys = source_polygons.select do |points|
+  #   points.all?(within_bounds)
+  # end
 
   save(selected_polys)
 end

@@ -15,15 +15,16 @@
                 left: 0;
                 right: 0;
             }
-            .pyra {
-                border-radius: 8px;
-                padding: 3px;
-                padding-top: 5px;
-                border: 1px solid black;
-                background-color: #cecece;
-                width: auto !important;
-                    height; auto !important;
+            .clusterLabel {
+                border-radius: 20px;
+                padding: 10px;
+                box-shadow: 1px 1px 15px -5px #000000;
             }
+            .hasFree { background-color: rgb(181, 226, 140); }
+            .onlyReserved { background-color: #ff9b9b; }
+
+            .freeCnt { color: green; font-weight: bold; font-size: 12pt; }
+            .reservedCnt { color: #ff1616; font-size: 8pt; }
         </style>
     </head>
 
@@ -66,13 +67,28 @@
                     }
                 });
                 let freeCnt = markers.length - reservedCnt;
-                let text = `${freeCnt} / ${reservedCnt}`;
-                let html = `<span style="white-space: nowrap;">${text}</span>`;
+                let freeHtml = freeCnt > 0 ? `<div class="freeCnt">${freeCnt} free</div>` : '';
+                let reservedHtml = reservedCnt > 0 ? `<div class="reservedCnt">${reservedCnt} reserved</div>` : '';
+
+                let html = `
+                    <span style="white-space: nowrap;">
+                      ${freeHtml} ${reservedHtml}
+                    </span>
+                `;
+
+                let classNames = ['clusterLabel'];
+
+                if (freeCnt > 0) {
+                    classNames.push('hasFree');
+                }
+                else if (reservedCnt > 0) {
+                    classNames.push('onlyReserved');
+                }
 
                 return L.divIcon({
                     html: html,
-                    className: 'pyra',
-                    iconSize: L.point(40, 20)
+                    className: classNames.join(' '),
+                    iconSize: L.point()
                 });
             },
 
